@@ -83,6 +83,11 @@ function Projects() {
   const [selected, setSelected] = useState(null);
   const [closing, setClosing] = useState(false);
 
+  // Scroll to top on mount
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   useEffect(() => {
     document.body.style.overflow = selected ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };

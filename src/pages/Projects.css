@@ -32,6 +32,10 @@
   flex-direction: column;
   align-items: center;
   padding: 40px 20px 180px;
+  overflow-x: hidden;
+  max-width: 100vw;
+  --spread-x: 1;
+  --spread-y: 1;
 }
 
 
@@ -263,7 +267,7 @@
    zero-delay transitions for hover.
    ======================================== */
 .fdr--open .fcard {
-  transform: translateY(var(--ty)) translateX(var(--tx)) rotate(var(--rot));
+  transform: translateY(calc(var(--ty) * var(--spread-y))) translateX(calc(var(--tx) * var(--spread-x))) rotate(var(--rot));
   /* Initial fan-out: slow + staggered */
   transition:
     transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
@@ -277,7 +281,7 @@
 
 /* After initial animation, hover uses fast instant transitions */
 .fdr--open .fcard:hover {
-  transform: translateY(calc(var(--ty) - 8px)) translateX(var(--tx)) rotate(var(--rot)) scale(1.03);
+  transform: translateY(calc((var(--ty) - 8px) * var(--spread-y))) translateX(calc(var(--tx) * var(--spread-x))) rotate(var(--rot)) scale(1.03);
   z-index: 50 !important;
   box-shadow:
     0 8px 16px rgba(0,0,0,0.08),
@@ -527,8 +531,21 @@
 /* ========================================
    RESPONSIVE
    ======================================== */
+@media (max-width: 900px) {
+  .folder-area {
+    --spread-x: 0.65;
+    --spread-y: 0.9;
+  }
+}
+
 @media (max-width: 600px) {
+  .folder-area {
+    --spread-x: 0.35; /* Much tighter horizontal fan */
+    --spread-y: 0.8;
+  }
   .fdr { width: 250px; height: 190px; }
   .fcard { width: 185px; height: 148px; left: -92px; }
+  .fdr__shadow { width: 200px; }
+  .fdr__shadow--open { width: 340px; }
   .overlay__card { padding: 28px 24px; max-width: 95vw; }
 }
