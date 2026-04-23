@@ -119,19 +119,19 @@ function Home() {
             </div>
             <div className="detail-card glass-panel ani-scroll ani-delay-2">
               <span className="detail-card__label">Phone</span>
-              <span className="detail-card__value">+91 XXXXX XXXXX</span>
+              <span className="detail-card__value">+91 73969 61881</span>
             </div>
             <div className="detail-card glass-panel ani-scroll ani-delay-3">
               <span className="detail-card__label">Personal Email</span>
-              <span className="detail-card__value">samhith@example.com</span>
+              <span className="detail-card__value">muthyalasamhith@gmail.com</span>
             </div>
             <div className="detail-card glass-panel ani-scroll ani-delay-4">
               <span className="detail-card__label">College Email</span>
-              <span className="detail-card__value">samhith@mec.edu.in</span>
+              <span className="detail-card__value">se23umcs034@mahindrauniversity.edu.in</span>
             </div>
             <div className="detail-card glass-panel ani-scroll ani-delay-5">
               <span className="detail-card__label">Education</span>
-              <span className="detail-card__value">B.Tech (Intd. CSE) — MEC</span>
+              <span className="detail-card__value">B.Tech (Intd. CSE) — Mahindra École Centrale</span>
             </div>
             <div className="detail-card glass-panel ani-scroll ani-delay-6">
               <span className="detail-card__label">Location</span>
