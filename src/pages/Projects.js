@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import './Projects.css';
 
 function useAniScroll() {
@@ -78,96 +79,168 @@ const projects = [
 
 function Projects() {
   const pageRef = useAniScroll();
+  const [isOpen, setIsOpen] = useState(false);
+  const [selected, setSelected] = useState(null);
+  const [closing, setClosing] = useState(false);
+
+  useEffect(() => {
+    document.body.style.overflow = selected ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [selected]);
+
+  // Clicking the folder always toggles open/close
+  const handleFolderClick = () => {
+    if (!selected) setIsOpen(prev => !prev);
+  };
+
+  // Clicking a file card:
+  //  - If folder is CLOSED → do nothing, let click bubble to toggle folder
+  //  - If folder is OPEN → open detail, stop propagation
+  const handleFileClick = (e, project) => {
+    if (isOpen) {
+      e.stopPropagation();
+      setSelected(project);
+    }
+    // When closed: don't stopPropagation → click reaches .fdr → toggleFolder fires
+  };
+
+  const closeDetail = useCallback(() => {
+    setClosing(true);
+    setTimeout(() => {
+      setSelected(null);
+      setClosing(false);
+    }, 300);
+  }, []);
+
+  useEffect(() => {
+    const fn = (e) => {
+      if (e.key === 'Escape') {
+        if (selected) closeDetail();
+        else if (isOpen) setIsOpen(false);
+      }
+    };
+    window.addEventListener('keydown', fn);
+    return () => window.removeEventListener('keydown', fn);
+  }, [selected, isOpen, closeDetail]);
 
   return (
     <div className="page-wrapper" ref={pageRef}>
       {/* Hero */}
-      <section className="projects-hero">
+      <section className="proj-hero">
         <div className="container">
           <span className="section-label ani-scroll">Portfolio</span>
-          <h1 className="projects-hero__title ani-scroll ani-delay-1">
-            Selected Projects
-          </h1>
-          <p className="projects-hero__subtitle ani-scroll ani-delay-2">
-            A collection of projects I have built — from AI-powered tools
-            to client websites. Each project reflects my passion for
-            clean design and functional code.
+          <h1 className="proj-hero__title ani-scroll ani-delay-1">Selected Projects</h1>
+          <p className="proj-hero__sub ani-scroll ani-delay-2">
+            Hover to peek, click to explore.
           </p>
         </div>
       </section>
 
-      {/* Project Cards */}
-      <section className="projects-list section">
-        <div className="container">
-          {projects.map((project, index) => (
-            <article
-              key={project.id}
-              className={`project-card glass-panel ani-scroll ani-delay-${index + 1}`}
-            >
-              <div className="project-card__index">
-                {String(index + 1).padStart(2, '0')}
-              </div>
+      {/* Folder */}
+      <section className="folder-area">
+        <div className={`fdr ${isOpen ? 'fdr--open' : ''}`} onClick={handleFolderClick}>
 
-              <div className="project-card__content">
-                <div className="project-card__top">
-                  <h2 className="project-card__title">{project.title}</h2>
-                  <span className="project-card__period">{project.period}</span>
-                </div>
-                <p className="project-card__org">{project.org}</p>
-                <p className="project-card__desc">{project.description}</p>
+          {/* Back wall */}
+          <div className="fdr__back">
+            <div className="fdr__back-shine" />
+          </div>
 
-                <div className="project-card__bottom">
-                  <div className="project-card__tags">
-                    {project.tags.map((tag) => (
-                      <span key={tag} className="tag">{tag}</span>
-                    ))}
+          {/* Files */}
+          <div className="fdr__files">
+            {projects.map((p, i) => {
+              const n = projects.length;
+              const mid = (n - 1) / 2;
+              const rot = (i - mid) * 18;
+              const tx = (i - mid) * 170;
+              const ty = 180 + Math.abs(i - mid) * 26;
+              return (
+                <div
+                  key={p.id}
+                  className="fcard"
+                  style={{
+                    '--rot': `${rot}deg`,
+                    '--tx': `${tx}px`,
+                    '--ty': `-${ty}px`,
+                    '--delay': `${i * 40}ms`,
+                    zIndex: 10 + (n - i),
+                  }}
+                  onClick={(e) => handleFileClick(e, p)}
+                >
+                  <div className="fcard__notch" />
+                  <div className="fcard__body">
+                    <span className="fcard__num">{String(i + 1).padStart(2, '0')}</span>
+                    <h3 className="fcard__title">{p.title}</h3>
+                    <p className="fcard__org">{p.org}</p>
+                    <div className="fcard__tags">
+                      {p.tags.slice(0, 2).map(t => (
+                        <span key={t} className="fcard__tag">{t}</span>
+                      ))}
+                    </div>
                   </div>
-                  {project.link && (
-                    <a
-                      href={project.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="project-card__btn"
-                    >
-                      <span>{project.linkText}</span>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M7 17L17 7" />
-                        <path d="M7 7h10v10" />
-                      </svg>
-                    </a>
-                  )}
                 </div>
-              </div>
-            </article>
-          ))}
+              );
+            })}
+          </div>
+
+          {/* Front cover */}
+          <div className="fdr__front">
+            <div className="fdr__front-gloss" />
+          </div>
         </div>
+
+        <div className={`fdr__shadow ${isOpen ? 'fdr__shadow--open' : ''}`} />
       </section>
+
+      {/* Detail Overlay via Portal */}
+      {selected && createPortal(
+        <div className={`overlay ${closing ? 'overlay--out' : ''}`} onClick={closeDetail}>
+          <div className={`overlay__card ${closing ? 'overlay__card--out' : ''}`} onClick={e => e.stopPropagation()}>
+            <button className="overlay__x" onClick={closeDetail} aria-label="Close">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <path d="M18 6L6 18"/><path d="M6 6l12 12"/>
+              </svg>
+            </button>
+            <span className="overlay__period">{selected.period}</span>
+            <h2 className="overlay__title">{selected.title}</h2>
+            <p className="overlay__org">{selected.org}</p>
+            <div className="overlay__divider" />
+            <p className="overlay__desc">{selected.description}</p>
+            <div className="overlay__tags">
+              {selected.tags.map(t => <span key={t} className="overlay__tag">{t}</span>)}
+            </div>
+            {selected.link && (
+              <a href={selected.link} target="_blank" rel="noopener noreferrer"
+                className="btn btn--primary overlay__cta">
+                {selected.linkText}
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M7 17L17 7"/><path d="M7 7h10v10"/>
+                </svg>
+              </a>
+            )}
+          </div>
+        </div>,
+        document.body
+      )}
 
       {/* CTA */}
       <section className="cta section">
         <div className="container">
           <div className="cta-card glass-panel ani-scroll">
-            <h2 className="cta-card__title ani-scroll">
-              Want to collaborate?
-            </h2>
+            <h2 className="cta-card__title ani-scroll">Want to collaborate?</h2>
             <p className="cta-card__desc ani-scroll ani-delay-1">
               I am always open to discussing new projects, creative ideas,
               or opportunities to be part of your vision.
             </p>
             <div className="cta-card__actions ani-scroll ani-delay-2">
-              <a href="mailto:samhith@example.com" className="btn btn--primary">
-                Get in Touch
-              </a>
-              <a
-                href="https://github.com/Samhith-m5"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn--glass"
-              >
+              <a href="mailto:samhith@example.com" className="btn btn--primary">Get in Touch</a>
+              <a href="https://github.com/Samhith-m5" target="_blank" rel="noopener noreferrer"
+                className="btn btn--glass">
                 <span>All Repositories</span>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M7 17L17 7" />
-                  <path d="M7 7h10v10" />
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M7 17L17 7"/><path d="M7 7h10v10"/>
                 </svg>
               </a>
             </div>

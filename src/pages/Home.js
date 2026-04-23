@@ -86,8 +86,10 @@ function Home() {
       {/* ===== STATS ===== */}
       <section className="stats section">
         <div className="container">
+          <span className="section-label ani-scroll">Metrics</span>
+          <h2 className="section-title ani-scroll ani-delay-1">Academics & Milestones</h2>
           <div className="stats__grid">
-            <div className="stat-card glass-panel ani-scroll">
+            <div className="stat-card glass-panel ani-scroll ani-delay-1">
               <span className="stat-card__number">6.39</span>
               <span className="stat-card__label">CGPA (5th Sem)</span>
             </div>

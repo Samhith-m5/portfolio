@@ -17,6 +17,7 @@
 }
 
 .navbar__pill {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 2px;
@@ -32,6 +33,16 @@
   animation: navEnter 1s var(--ease) 0.3s both;
 }
 
+.navbar__indicator {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: var(--radius-pill);
+  transition: all 0.4s var(--ease-spring);
+  z-index: 0;
+}
+
 @keyframes navEnter {
   from { opacity: 0; transform: translateY(-12px); filter: blur(4px); }
   to { opacity: 1; transform: translateY(0); filter: blur(0); }
@@ -43,12 +54,13 @@
 
 .navbar__link {
   position: relative;
+  z-index: 1;
   padding: 8px 20px;
   font-size: 13px;
   font-weight: 500;
   color: var(--text-secondary);
   border-radius: var(--radius-pill);
-  transition: all 0.25s var(--ease);
+  transition: color 0.25s var(--ease);
   display: flex;
   align-items: center;
   gap: 4px;
@@ -63,8 +75,8 @@
 
 .navbar__link--active {
   color: var(--text-primary);
-  background: rgba(0, 0, 0, 0.05);
   font-weight: 600;
+  /* background removed because the indicator handles it */
 }
 
 .navbar__link--external svg {

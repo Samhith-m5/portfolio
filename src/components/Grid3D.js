@@ -32,7 +32,9 @@ function Grid3D() {
     ctx.translate(mx * W, my * H);
 
     const col = '110, 165, 205';
-    const wallLines = 18;
+    // Calculate lines dynamically to make the grid proper squares
+    const linesX = 24;
+    const linesY = Math.max(1, Math.round(linesX * (H / W)));
     const depthRects = 18;
 
     // ============================
@@ -72,39 +74,41 @@ function Grid3D() {
     ctx.fillRect(bwL, bwT, bwW, bwH);
 
     // Back wall grid perfectly aligns with the side wall converging lines
-    const cellW = bwW / wallLines;
-    const cellH = bwH / wallLines;
+    const cellW = bwW / linesX;
+    const cellH = bwH / linesY;
 
     ctx.save();
     ctx.beginPath();
     ctx.rect(bwL, bwT, bwW, bwH);
     ctx.clip();
 
-    for (let i = 0; i <= wallLines; i++) {
+    for (let i = 0; i <= linesX; i++) {
       const x = bwL + i * cellW;
+      line(x, bwT, x, bwB, 0.10); // vertical back wall
+    }
+    for (let i = 0; i <= linesY; i++) {
       const y = bwT + i * cellH;
-      line(x, bwT, x, bwB, 0.19); // vertical back wall (0.22 * 0.89 = 0.19)
-      line(bwL, y, bwR, y, 0.19); // horizontal back wall
+      line(bwL, y, bwR, y, 0.10); // horizontal back wall
     }
     ctx.restore();
 
     // Back wall border
-    ctx.strokeStyle = `rgba(${col}, 0.45)`;
+    ctx.strokeStyle = `rgba(${col}, 0.25)`;
     ctx.lineWidth = 1.5 * dpr;
     ctx.strokeRect(bwL, bwT, bwW, bwH);
 
     // ============================
     // CONVERGING WALL LINES (Structure)
     // ============================
-    const lineA = 0.31; // 0.35 * 0.89 = 0.31
+    const lineA = 0.15; // highly subtle
 
-    for (let i = 0; i <= wallLines; i++) {
-      const t = i / wallLines;
+    for (let i = 0; i <= linesX; i++) {
+      const t = i / linesX;
       line(t * W, H, bwL + t * bwW, bwB, lineA); // floor
       line(t * W, 0, bwL + t * bwW, bwT, lineA); // ceiling
     }
-    for (let i = 0; i <= wallLines; i++) {
-      const t = i / wallLines;
+    for (let i = 0; i <= linesY; i++) {
+      const t = i / linesY;
       line(0, t * H, bwL, bwT + t * bwH, lineA); // left
       line(W, t * H, bwR, bwT + t * bwH, lineA); // right
     }
@@ -119,7 +123,7 @@ function Grid3D() {
 
       if (d > 0.98) continue;
 
-      const alpha = 0.31 * (1 - d * 0.6); // 0.35 * 0.89 = 0.31
+      const alpha = 0.15 * (1 - d * 0.6); // highly subtle
       const lw = Math.max(0.4, (1 - d) * 1.0);
 
       // Floor
