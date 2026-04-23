@@ -1,0 +1,85 @@
+/* ============================================
+   Pill Navbar
+   ============================================ */
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--nav-height);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+  pointer-events: none;
+}
+
+.navbar__pill {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: var(--radius-pill);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.03);
+  pointer-events: all;
+  transition: all 0.5s var(--ease);
+  animation: navEnter 1s var(--ease) 0.3s both;
+}
+
+@keyframes navEnter {
+  from { opacity: 0; transform: translateY(-12px); filter: blur(4px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+.navbar--scrolled .navbar__pill {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.04);
+}
+
+.navbar__link {
+  position: relative;
+  padding: 8px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border-radius: var(--radius-pill);
+  transition: all 0.25s var(--ease);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  user-select: none;
+  letter-spacing: -0.01em;
+}
+
+.navbar__link:hover {
+  color: var(--text-primary);
+}
+
+.navbar__link--active {
+  color: var(--text-primary);
+  background: rgba(0, 0, 0, 0.05);
+  font-weight: 600;
+}
+
+.navbar__link--external svg {
+  opacity: 0.4;
+  transition: all 0.2s ease;
+}
+
+.navbar__link--external:hover svg {
+  opacity: 0.8;
+  transform: translate(1px, -1px);
+}
+
+@media (max-width: 480px) {
+  .navbar__link {
+    padding: 7px 14px;
+    font-size: 12px;
+  }
+}
